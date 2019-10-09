@@ -1,0 +1,22 @@
+1. subset a b: I wrote a helper function to see is an element belongs to a set. If all elements in a belong to b, then a is a subset of b.
+2. equal_sets a b: If a is a subset of b and b is a subset of a, then a equals to b
+3. set_union a b: I directly used @ to append b to a
+4. set_intersection a b: if a is empty then intersection is empty; else for each element in a, if it also belongs to b, we append this element to the return list
+5. set_diff a b: if a is empty then the diff is empty; else for each element in a, if it is not in b, append it to return list
+6. computed_fixed_point eq f x: if x=f(x) then return x; else computer f(x) and f(f(x)), and continue goes into the loop if no value is found
+7. filter_reachable g: Here g is a pair of (start_symb, list of rules). The idea is from the start_symb, we generate a new list of all reachable rules, and we use
+the new generated list as a reference to filter out and delete all unreachanble rules from the original list of rules. Then we return the pair (start_symb, reachable rules)
+	7a. To generate the new list of all reachable rules, we recursively check if from *SOME* start we should add more rules to the return list. Here I used the 
+	fixed point function, because whenever new rules are added to the return list, the return list expands. When the return list does not change anymore, it means 
+	all reachable rules are added, to some extent it follows the idea f(x) = x. So the recursion stops when no new rules are added to the return list.
+	7b. To implement 7a, we also need a helper function to return a new reachable list from a *GIVEN* start_symb and a list of unfiltered rules. So I had reachable_list 
+	function. If for one (symbol, rules) pair, the symbol equals to start_symbol, or is reachable from the current new reachable list we returned, we append the (symbol,rules)
+	to our return list and update it. 
+	7c. To implement 7b, we need a helper function to see if a symbol if reachable from a list of (symbol, rule) pairs. So we recursively check
+	if this symbol belongs to any rule in the pair in the list.
+	7d. To implement 7c, I wrote another helper function to check whether a symbol is reachable from a single rule. A symbol is reachable when it can be found in the rule 
+	(of the form (N _)).
+Besides at the beginning I was very confused of how to implement filter_reachable function, another problem I encountered was when I ran my test cases for filter_reachable g,
+I got mismatched type error. Basically for one parameter my function expected 'a type but my test case was of string type. After one hour of debugging it turned out that this error
+only occurs when I ran my test cases on Ocaml 4.03. I didn't get this error again when I ran the test on our server with Ocaml 4.09. 
+ 
