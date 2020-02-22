@@ -1,0 +1,51 @@
+I wrote make_parse in terms of make_matcher. Make_matcher and make_parser are 
+quite similar, in that both derive a prefix of the fragment according to some 
+rules so that the suffix satisfies some rules. The difference is for a matcher, 
+the suffix should satisfy some acceptor, but for a parser, the suffix should be 
+empty. Another difference is a parser take records of the steps to take to 
+reach the desired fragment, but a matcher doesn't. 
+
+My basic idea of deriving a fragment is as following: from a start symbol, we 
+starts from the first rule list. We look for the matching prefix step by step, 
+and for each step, if no prefix matches, we return None. Otherwise we call the 
+acceptor on suffix to see if it is accepted. If yes, we return the value that
+the acceptor returns, or we go back to look for the next prefix. For 
+make_parser function, we make a small modification that we keep track of what 
+rules are accepted. We name it derivation, and then we generate a parse_tree 
+from this derivation. 
+
+Although the two functions are quite similar logically, I did not wrote a mutual
+function for them. A main reason is that I wrote make_matcher first, and I did
+not track my derivation in my solution. And for make_parser, since I need one 
+more thing to return, I basically followed the logic of match_matcher and 
+rewrote it for make_parser. If I have written make_parser first, I would have 
+had a way to reuse my function for make_matcher, for the only difference is 
+different acceptor. 
+
+I also considered using parse_tree_leaves in make_parse function. But then I 
+would have to create a gigantic tree based on grammar rules, return all the 
+leaves, and look for if the fragment is reachable. But two things I was not sure 
+were (1) what if the grammar is extremely long and has a lot of recursions that
+leads to itself, and (2) if it is a good idea to rewrite parse_tree_leaves and 
+keep all the derivations for the leaves that it returns. Intuitively I thought 
+it might lead to a long return list or runs to itself, and it seemed not 
+efficient either. 
+
+Weakness assessment:
+(1) When the grammar somehow goes to itself, and keeps expanding (e.g. A->A), my
+program does not filter it out; instead, it goes to infinite loop until it is 
+interrupted manually. 
+(2) When the grammar is long, and when there are some redundant rules such as 
+unreachable rules, the program does not filter it out. It would follow the 
+grammar and check every rules in order, which might waste some time and take 
+more space. 
+(3) make_parser is not exhaustive, for it does not check for empty derivation. I
+thought about making it exhaustive, but because I had no idea how to construct 
+an empty parse_tree, I just skipped this case.
+(4) The program behaves poorly when the fragment is noticeably long (e.g. test
+case 4 in the homework spec). This is because the program is recursive, and it
+has backtracking at the same time. 
+(5) I did not reuse my functions, so my code seems long. 
+(6) Some programming style problems: Next time I would try to break down a huge
+function into chunks, and write some small helper functions instead. Keeping a 
+long function is not friendly to readers and usally causes confusions logically.
